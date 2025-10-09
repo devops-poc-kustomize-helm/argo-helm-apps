@@ -1,37 +1,32 @@
 {{- $stage := .Values.stage }}
 {{- $cluster := .Values.cluster }}
 {{- $namespace := .Values.namespace }}
-
-{{- range .Values.applications }}
+{{- range $app := .Values.applications }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ printf "%s-%s" $stage .name | trunc 63 | trimSuffix "-" }}
+  name: {{ $stage }}-{{ $app.name }}
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/devops-poc-kustomize-helm/helm-template.git
-    targetRevision: main
+    chart: dox-cli
     path: .
     helm:
-      valueFiles:
-        - values-{{ $stage }}.yaml
       parameters:
         - name: image.repository
-          value: devstackhub/{{ .name }}
-        - name: image.tag
-          value: {{ .image.tag | quote }}
+          value: devstackhub/{{ $app.name }}
+        - name: service.name
+          value: {{ $app.name }}
         - name: deployment.stage
           value: {{ $stage }}
-        {{- if .serviceAccount }}
-        - name: serviceAccount.name
-          value: {{ .serviceAccount.name }}
-        {{- end }}
+      values: |
+        {{ $app | toYaml | nindent 8 }}
   destination:
-    server: {{ $cluster | quote }}
-    namespace: {{ $namespace | quote }}
+    server: {{ $cluster }}
+    namespace: {{ $namespace }}
   syncPolicy:
     automated:
       prune: true
