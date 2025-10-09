@@ -1,0 +1,41 @@
+{{- $stage := .Values.stage }}
+{{- $cluster := .Values.cluster }}
+{{- $namespace := .Values.namespace }}
+
+{{- range $app := .Values.applications }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $stage }}-{{ $app.name }}
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/devstackhub/helm-charts.git    # 🔹 Git repo containing the app chart
+    targetRevision: main
+    path: charts/{{ $app.name }}                              # 🔹 Path to that specific app’s chart
+    helm:
+      valueFiles:
+        - values-{{ $stage }}.yaml                            # e.g., values-dev.yaml
+      parameters:
+        - name: image.repository
+          value: devstackhub/{{ $app.name }}
+        - name: image.tag
+          value: {{ $app.image.tag }}
+        - name: deployment.stage
+          value: {{ $stage }}
+        {{- if $app.serviceAccount }}
+        - name: serviceAccount.name
+          value: {{ $app.serviceAccount.name }}
+        {{- end }}
+  destination:
+    server: {{ $cluster }}
+    namespace: {{ $namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}
