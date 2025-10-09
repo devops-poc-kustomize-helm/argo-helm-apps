@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/devops-poc-kustomize-helm/helm-template.git    # 🔹 Git repo containing the app chart
     targetRevision: main
-    path: charts/{{ $app.name }}                              # 🔹 Path to that specific app’s chart
+    path: .                              # 🔹 Path to that specific app’s chart
     helm:
       valueFiles:
         - values-{{ $stage }}.yaml                            # e.g., values-dev.yaml
