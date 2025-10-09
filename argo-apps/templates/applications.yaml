@@ -12,6 +12,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/devops-poc-kustomize-helm/helm-template.git
+    targetRevision: HEAD                     # ✅ required (branch or tag)
     chart: dox-cli
     path: .
     helm:
