@@ -12,7 +12,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/devstackhub/helm-charts.git    # 🔹 Git repo containing the app chart
+    repoURL: https://github.com/devops-poc-kustomize-helm/helm-template.git    # 🔹 Git repo containing the app chart
     targetRevision: main
     path: charts/{{ $app.name }}                              # 🔹 Path to that specific app’s chart
     helm:
